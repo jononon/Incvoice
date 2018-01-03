@@ -1,0 +1,89 @@
+<html lang="en">
+  <head>
+    <script src="static/js/jquery-3.1.0.min.js"></script>
+    <script src="static/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="static/css/bootstrap.min.css">
+  </head>
+
+    <div class=container-fluid>
+      <br>
+      <row>
+        <div class="col-xs-12 col-sm-10 col-sm-offset-1 col-md-6 col-md-offset-3 col-lg-4 col-lg-offset-4">
+          <div class="form-horizontal">
+            <div class="form-group">
+              <label for="email" class="col-sm-2 control-label">Email</label>
+              <div class="col-sm-10">
+                <input type="email" class="form-control" id="email" placeholder="Email">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="password" class="col-sm-2 control-label">Password</label>
+              <div class="col-sm-10">
+                <input type="password" class="form-control" id="password" placeholder="Password">
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-offset-2 col-sm-10">
+                <div class="checkbox">
+                  <label>
+                    <input type="checkbox"> Remember me
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-offset-2 col-sm-10">
+                <button id="submit" class="btn btn-default">Sign in</button>
+              </div>
+            </div>
+          </div>
+        <div>
+      </row>
+    </div>
+    <script src="https://www.gstatic.com/firebasejs/4.1.3/firebase.js"></script>
+    <script>
+      // Initialize Firebase
+      var config = {
+        apiKey: "AIzaSyBpc8vBRJ0TzfQFXXTu749BXsqAT4RWwrI",
+        authDomain: "incvoice-da4b0.firebaseapp.com",
+        databaseURL: "https://incvoice-da4b0.firebaseio.com",
+        projectId: "incvoice-da4b0",
+        storageBucket: "incvoice-da4b0.appspot.com",
+        messagingSenderId: "728980127190"
+      };
+
+      firebase.initializeApp(config);
+
+      $("#submit").click(function(e){
+        login();
+      });
+
+      function login() {
+        var email = $("#email").val();
+        var password = $("#password").val();
+        firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
+          // Handle Errors here.
+          var errorCode = error.code;
+          var errorMessage = error.message;
+          // ...
+        });
+      }
+      firebase.auth().onAuthStateChanged(function(user) {
+        if (user) {
+          // User is signed in.
+          var displayName = user.displayName;
+          var email = user.email;
+          var emailVerified = user.emailVerified;
+          var photoURL = user.photoURL;
+          var isAnonymous = user.isAnonymous;
+          uid = user.uid;
+          var providerData = user.providerData;
+          // ...
+          $("#signinbtn").html("Logged in "+email)
+          window.location.href = "index.html";
+        } else {
+          $("#signinbtn").html("Sign in")
+        }
+      });
+    </script>
+</html>

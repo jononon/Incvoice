@@ -1,0 +1,211 @@
+<head>
+  <script src="static/js/jquery-3.1.0.min.js"></script>
+  <script src="static/js/bootstrap.bundle.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="static/css/bootstrap.min.css">
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">Incvoice</a>
+      <span class="navbar-text" id=welcomename>
+
+      </span>
+    </div>
+  </nav>
+  <div id="invoices" class="container">
+    <h3>Invoices</h3>
+  </div>
+  <div id="info" class="container">
+    <h3>Info</h3>
+  </div>
+  <div id=editInfoModal class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Edit Info</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="infoTitle">Default</span>
+            </div>
+            <input id="infoBox" type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" onclick="finishedEditing()">Save changes</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id=invoiceModal class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Invoice</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <dl class="row">
+            <dt class="col-sm-3">Date</dt>
+            <dd class="col-sm-9" id=date>1/2/2018</dd>
+
+            <dt class="col-sm-3">Amount</dt>
+            <dd class="col-sm-9" id=amount>$22.22</dd>
+
+            <dt class="col-sm-3">Description</dt>
+            <dd class="col-sm-9" id=description>Test</dd>
+
+            <dt class="col-sm-3 text-truncate">Account</dt>
+            <dd class="col-sm-9" id=account>99-99999</dd>
+
+            <dt class="col-sm-3 text-truncate">Status</dt>
+            <dd class="col-sm-9" id=status>Submitted</dd>
+          </dl>
+          <img id=receipt src="http://www.rmweb.co.uk/community/uploads/monthly_03_2015/post-7247-0-41783300-1427404038.jpg" class="img-fluid" alt="Responsive image">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/4.8.1/firebase.js"></script>
+  <script>
+    // Initialize Firebase
+    var config = {
+      apiKey: "AIzaSyBpc8vBRJ0TzfQFXXTu749BXsqAT4RWwrI",
+      authDomain: "incvoice-da4b0.firebaseapp.com",
+      databaseURL: "https://incvoice-da4b0.firebaseio.com",
+      projectId: "incvoice-da4b0",
+      storageBucket: "incvoice-da4b0.appspot.com",
+      messagingSenderId: "728980127190"
+    };
+
+    firebase.initializeApp(config);
+    var uid = "";
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        // User is signed in.
+        var displayName = user.displayName;
+        var email = user.email;
+        var emailVerified = user.emailVerified;
+        var photoURL = user.photoURL;
+        var isAnonymous = user.isAnonymous;
+        uid = user.uid;
+        var providerData = user.providerData;
+
+        var invoiceRef = firebase.database().ref(uid+'/invoices');
+        invoiceRef.on('value', function(snapshot) {
+          populateInvoices(snapshot.val());
+        });
+
+        var userRef = firebase.database().ref(uid+'/user');
+        var billingRef = firebase.database().ref(uid+'/billing');
+
+        userRef.on('value', function(userSnapshot) {
+          $("#welcomename").html("Welcome, "+userSnapshot.val().name+".");
+          billingRef.once('value').then(function(billingSnapshot) {
+            populateInfo(userSnapshot.val(),billingSnapshot.val());
+          });
+        });
+
+        billingRef.on('value', function(billingSnapshot) {
+          userRef.once('value').then(function(userSnapshot) {
+            populateInfo(userSnapshot.val(),billingSnapshot.val());
+          });
+        });
+
+      } else {
+        window.location.replace("login.html");
+      }
+    });
+
+    function populateInvoices(invoices) {
+      if(invoices.length > 0) {
+        var invoicehtml = "<h3>Invoices</h3><table class='table'><thead><tr><th scope='col'>Date</th><th scope='col'>Description</th><th scope='col'>Amount</th><th scope='col'>Status</th><th scope='col'></th></tr></thead><tbody>";
+        for (var i = 0; i < invoices.length; i++) {
+          invoicehtml+="<tr><td>"+invoices[i].date+"</td><td>"+invoices[i].description+"</td><td>$"+invoices[i].amount+"</td><td>"+invoices[i].status+"</td><th><button type='button' class='btn btn-outline-dark btn-sm' onclick=openInvoiceModal("+i+")>More</button></th></tr>";
+        }
+        invoicehtml+="</tbody></table>";
+        $("#invoices").html(invoicehtml);
+      }
+    }
+
+    function populateInfo(user, billing) {
+      var infohtml = "<h3>Info</h3><table class='table'><tbody>";
+      infohtml+="<tr><th scope='row'>Name</th><td>"+user.name+"</td><td><button type='button' class='btn btn-outline-dark btn-sm' onclick=editInfo('userName')>Edit</button></td></tr>";
+      infohtml+="<tr><th scope='row'>Billing Name</th><td>"+billing.name+"</td><td><button type='button' class='btn btn-outline-dark btn-sm' onclick=editInfo('name')>Edit</button></td></tr>";
+      infohtml+="<tr><th scope='row'>Address Line 1</th><td>"+billing.address1+"</td><td><button type='button' class='btn btn-outline-dark btn-sm' onclick=editInfo('address1')>Edit</button></td></tr>";
+      infohtml+="<tr><th scope='row'>Address Line 2</th><td>"+billing.address2+"</td><td><button type='button' class='btn btn-outline-dark btn-sm' onclick=editInfo('address2')>Edit</button></td></tr>";
+      infohtml+="<tr><th scope='row'>City</th><td>"+billing.city+"</td><td><button type='button' class='btn btn-outline-dark btn-sm' onclick=editInfo('city')>Edit</button></td></tr>";
+      infohtml+="<tr><th scope='row'>State</th><td>"+billing.state+"</td><td><button type='button' class='btn btn-outline-dark btn-sm' onclick=editInfo('state')>Edit</button></td></tr>";
+      infohtml+="<tr><th scope='row'>Zip</th><td>"+billing.zip+"</td><td><button type='button' class='btn btn-outline-dark btn-sm' onclick=editInfo('zip')>Edit</button></td></tr>";
+      infohtml+="</tbody></table>";
+      $("#info").html(infohtml);
+    }
+    var currentField = "";
+    function editInfo(section) {
+      currentField = section;
+      switch (currentField) {
+        case "userName":
+          $("#infoTitle").html("Name");
+          firebase.database().ref(uid+'/user/name').once('value').then(function(snapshot) {$("#infoBox").val(snapshot.val())});
+        break;
+        case "name":
+          $("#infoTitle").html("Billing Name");
+          firebase.database().ref(uid+'/billing/name').once('value').then(function(snapshot) {$("#infoBox").val(snapshot.val())});
+        break;
+        case "address1":
+          $("#infoTitle").html("Address Line 1");
+          firebase.database().ref(uid+'/billing/address1').once('value').then(function(snapshot) {$("#infoBox").val(snapshot.val())});
+        break;
+        case "address2":
+          $("#infoTitle").html("Address Line 2");
+          firebase.database().ref(uid+'/billing/address2').once('value').then(function(snapshot) {$("#infoBox").val(snapshot.val())});
+        break;
+        case "city":
+          $("#infoTitle").html("City");
+          firebase.database().ref(uid+'/billing/city').once('value').then(function(snapshot) {$("#infoBox").val(snapshot.val())});
+        break;
+        case "state":
+          $("#infoTitle").html("State");
+          firebase.database().ref(uid+'/billing/state').once('value').then(function(snapshot) {$("#infoBox").val(snapshot.val())});
+        break;
+        case "zip":
+          $("#infoTitle").html("Zip");
+          firebase.database().ref(uid+'/billing/zip').once('value').then(function(snapshot) {$("#infoBox").val(snapshot.val())});
+        break;
+      }
+      $('#editInfoModal').modal('show');
+    }
+
+    function finishedEditing() {
+      var val = $("#infoBox").val();
+      if(currentField=="userName")
+        firebase.database().ref(uid+'/user/name').set(val);
+      else
+        firebase.database().ref(uid+'/billing/'+currentField).set(val);
+      $('#editInfoModal').modal('hide');
+    }
+
+    function openInvoiceModal (number) {
+      firebase.database().ref(uid+'/invoices/'+number).once('value').then(function(snapshot) {
+        var val = snapshot.val();
+        $('#date').html(val.date);
+        $('#amount').html("$"+val.amount);
+        $('#description').html(val.description);
+        $('#account').html(val.account);
+        $('#status').html(val.status);
+        $('#receipt').attr('src',val.receipt);
+      });
+      $('#invoiceModal').modal('show');
+    }
+  </script>
+</body>
