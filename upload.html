@@ -13,17 +13,17 @@
   </nav>
   <div class="container">
     <h3>Submit Invoice</h3>
-    <form>
+    <form id=invoiceForm>
       <div class="form-group row">
         <label for="amount" class="col-sm-2 col-form-label">Amount</label>
         <div class="col-sm-10">
-          <input type="email" class="form-control" id="amount" placeholder="123.45">
+          <input type="text" class="form-control" id="amount" placeholder="123.45">
         </div>
       </div>
       <div class="form-group row">
         <label for="description" class="col-sm-2 col-form-label">Description</label>
         <div class="col-sm-10">
-          <input type="password" class="form-control" id="description" placeholder="Ralphs run for Ice Cream">
+          <input type="text" class="form-control" id="description" placeholder="Ralphs run for Ice Cream">
         </div>
       </div>
       <fieldset class="form-group">
@@ -31,73 +31,73 @@
           <label class="col-form-label col-sm-2 pt-0">Account</label>
           <div class="col-sm-10">
             <div class="form-check">
-              <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios1" value="option1" checked>
+              <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios1" value="33-08190" checked>
               <label class="form-check-label" for="gridRadios1">
                 33-08190 - General
               </label>
             </div>
             <div class="form-check">
-              <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios2" value="option2">
+              <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios2" value="33-08190A">
               <label class="form-check-label" for="gridRadios2">
                 33-08190A - Advertising
               </label>
             </div>
             <div class="form-check">
-              <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios2" value="option2">
+              <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios2" value="33-08190C">
               <label class="form-check-label" for="gridRadios2">
                 33-08190C - Coaching Gifts
               </label>
             </div>
             <div class="form-check">
-              <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios2" value="option2">
+              <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios2" value="33-08190D">
               <label class="form-check-label" for="gridRadios2">
                 33-08190D - Documentary
               </label>
             </div>
             <div class="form-check">
-              <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios2" value="option2">
+              <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios2" value="33-08190F">
               <label class="form-check-label" for="gridRadios2">
                 33-08190F - Food
               </label>
             </div>
             <div class="form-check">
-              <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios2" value="option2">
+              <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios2" value="33-08190G">
               <label class="form-check-label" for="gridRadios2">
                 33-08190G - Furniture Rental
               </label>
             </div>
             <div class="form-check">
-              <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios2" value="option2">
+              <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios2" value="33-08190H">
               <label class="form-check-label" for="gridRadios2">
                 33-08190H - Apparel
               </label>
             </div>
             <div class="form-check">
-              <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios2" value="option2">
+              <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios2" value="33-08190J">
               <label class="form-check-label" for="gridRadios2">
                 33-08190J - Business Cards
               </label>
             </div>
             <div class="form-check">
-              <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios2" value="option2">
+              <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios2" value="33-08190K">
               <label class="form-check-label" for="gridRadios2">
                 33-08190K - Event Signage
               </label>
             </div>
             <div class="form-check">
-              <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios2" value="option2">
+              <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios2" value="33-08190M">
               <label class="form-check-label" for="gridRadios2">
                 33-08190M - Materials
               </label>
             </div>
             <div class="form-check">
-              <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios2" value="option2">
+              <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios2" value="33-08190R">
               <label class="form-check-label" for="gridRadios2">
                 33-08190R - Transportation
               </label>
             </div>
             <div class="form-check">
-              <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios2" value="option2">
+              <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios2" value="33-08190T">
               <label class="form-check-label" for="gridRadios2">
                 33-08190T - Technology
               </label>
@@ -113,7 +113,7 @@
       </div>
       <div class="form-group row">
         <div class="col-sm-10">
-          <button type="submit" class="btn btn-primary">Sign in</button>
+          <button type="submit" class="btn btn-primary">Submit</button>
         </div>
       </div>
     </form>
@@ -148,5 +148,49 @@
         window.location.replace("login.html");
       }
     });
+
+    $('#invoiceForm').submit(function(ev) {
+        ev.preventDefault();
+        submitForm();
+    });
+
+    function submitForm () {
+
+      var element = document.getElementById('receipt');
+      if(element.files[0]) {
+        function guid() {
+          function s4() {
+            return Math.floor((1 + Math.random()) * 0x10000)
+              .toString(16)
+              .substring(1);
+          }
+          return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+            s4() + '-' + s4() + s4() + s4();
+        }
+
+        var storageRef = firebase.storage().ref();
+        var guidStr = guid()+'-'+(new Date).getTime();
+        var receiptRef = storageRef.child('receipts/'+guidStr+'.jpg');
+        receiptRef.put(element.files[0]).then(function(snapshot) {
+          var data = {
+            amount: $("#amount").val(),
+            description: $("#description").val(),
+            date: (new Date).toISOString(),
+            receipt: snapshot.downloadURL,
+            status: "Submitted",
+            account: $("input[name=gridRadios]:checked").val()
+          };
+          var ref = firebase.database().ref(uid+'/invoices/');
+          ref.once('value').then(function(snapshot) {
+            var arr = snapshot.val();
+            if(arr == undefined)
+              arr = [];
+            arr.push(data);
+            ref.set(arr);
+            window.location.replace("index.html");
+          });
+        });
+      }
+    }
   </script>
 </body>

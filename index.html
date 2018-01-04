@@ -111,6 +111,9 @@
 
         userRef.on('value', function(userSnapshot) {
           $("#welcomename").html("Welcome, "+userSnapshot.val().name+".");
+          if(userSnapshot.val().admin) {
+            $("#welcomename").html("<button type='button' class='btn btn-secondary btn-sm' onclick=window.location.replace('admin.html')>Go to Admin Console</button>");
+          }
           billingRef.once('value').then(function(billingSnapshot) {
             populateInfo(userSnapshot.val(),billingSnapshot.val());
           });
@@ -128,10 +131,12 @@
     });
 
     function populateInvoices(invoices) {
-      if(invoices.length > 0) {
-        var invoicehtml = "<h3>Invoices</h3><table class='table'><thead><tr><th scope='col'>Date</th><th scope='col'>Description</th><th scope='col'>Amount</th><th scope='col'>Status</th><th scope='col'></th></tr></thead><tbody>";
+      if(invoices == undefined) {
+        $("#invoices").html("<h3>Invoices</h3><p><center>Currently No Invoices. <button type='button' class='btn btn-outline-primary btn-sm' onclick=window.location.replace('upload.html')>Add one.</button></center></p>");
+      } else if(invoices.length > 0) {
+        var invoicehtml = "<h3>Invoices</h3><table class='table'><thead><tr><th scope='col'>Date</th><th scope='col'>Description</th><th scope='col'>Amount</th><th scope='col'>Status</th><th scope='col'><button type='button' class='btn btn-outline-primary btn-sm' onclick=window.location.replace('upload.html')>Add Invoice</button></th></tr></thead><tbody>";
         for (var i = 0; i < invoices.length; i++) {
-          invoicehtml+="<tr><td>"+invoices[i].date+"</td><td>"+invoices[i].description+"</td><td>$"+invoices[i].amount+"</td><td>"+invoices[i].status+"</td><th><button type='button' class='btn btn-outline-dark btn-sm' onclick=openInvoiceModal("+i+")>More</button></th></tr>";
+          invoicehtml+="<tr><td>"+(new Date(invoices[i].date)).toLocaleDateString()+"</td><td>"+invoices[i].description+"</td><td>$"+invoices[i].amount+"</td><td>"+invoices[i].status+"</td><th><button type='button' class='btn btn-outline-dark btn-sm' onclick=openInvoiceModal("+i+")>More</button></th></tr>";
         }
         invoicehtml+="</tbody></table>";
         $("#invoices").html(invoicehtml);
@@ -198,7 +203,7 @@
     function openInvoiceModal (number) {
       firebase.database().ref(uid+'/invoices/'+number).once('value').then(function(snapshot) {
         var val = snapshot.val();
-        $('#date').html(val.date);
+        $('#date').html(new Date(val.date).toLocaleString());
         $('#amount').html("$"+val.amount);
         $('#description').html(val.description);
         $('#account').html(val.account);
