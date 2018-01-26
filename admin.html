@@ -4,8 +4,8 @@
   <link rel="stylesheet" type="text/css" href="static/css/bootstrap.min.css">
 </head>
 <body>
-  <nav class="navbar navbar-expand-lg navbar-light bg-light" style="margin-bottom:20px">
-    <a class="navbar-brand" href="#"><strong>Incvoice</strong></a>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark" style="margin-bottom:20px">
+    <a class="navbar-brand" href="#"><strong>Incvoice</strong> Admin</a>
       <span class="navbar-text" id=welcomename>
 
       </span>
@@ -13,33 +13,6 @@
   </nav>
   <div id="invoices" class="container">
     <h3>Invoices</h3>
-  </div>
-  <div id="info" class="container">
-    <h3>Info</h3>
-  </div>
-  <div id=editInfoModal class="modal" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Edit Info</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <div class="input-group mb-3">
-            <div class="input-group-prepend">
-              <span class="input-group-text" id="infoTitle">Default</span>
-            </div>
-            <input id="infoBox" type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-primary" onclick="finishedEditing()">Save changes</button>
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        </div>
-      </div>
-    </div>
   </div>
   <div id=invoiceModal class="modal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
@@ -69,7 +42,9 @@
           </dl>
           <img id=receipt src="http://www.rmweb.co.uk/community/uploads/monthly_03_2015/post-7247-0-41783300-1427404038.jpg" class="img-fluid" alt="Responsive image">
         </div>
-        <div class="modal-footer" id=modalFooter></div>
+        <div class="modal-footer" id=modalFooter>
+
+        </div>
       </div>
     </div>
   </div>
@@ -99,7 +74,7 @@
         uid = user.uid;
         var providerData = user.providerData;
 
-        var invoiceRef = firebase.database().ref(uid+'/invoices');
+        var invoiceRef = firebase.database().ref();
         invoiceRef.on('value', function(snapshot) {
           populateInvoices(snapshot.val());
         });
@@ -108,9 +83,9 @@
         var billingRef = firebase.database().ref(uid+'/billing');
 
         userRef.on('value', function(userSnapshot) {
-          $("#welcomename").html("Welcome, "+userSnapshot.val().name+".");
-          if(userSnapshot.val().admin) {
-            $("#welcomename").html("<button type='button' class='btn btn-secondary btn-sm' onclick=window.location.replace('admin.html')>Go to Admin Console</button>");
+          $("#welcomename").html("Welcome, "+userSnapshot.val().name+". <button type='button' class='btn btn-secondary btn-sm' onclick=window.location.replace('index.html')>Go to User Console</button>");
+          if(!userSnapshot.val().admin) {
+            window.location.replace("index.html");
           }
           billingRef.once('value').then(function(billingSnapshot) {
             populateInfo(userSnapshot.val(),billingSnapshot.val());
@@ -128,13 +103,15 @@
       }
     });
 
-    function populateInvoices(invoices) {
-      if(invoices == undefined) {
-        $("#invoices").html("<h3>Invoices</h3><p><center>Currently No Invoices. <button type='button' class='btn btn-outline-primary btn-sm' onclick=window.location.replace('upload.html')>Add one.</button></center></p>");
-      } else if(invoices.length > 0) {
-        var invoicehtml = "<h3>Invoices</h3><table class='table'><thead><tr><th scope='col'>Date</th><th scope='col'>Description</th><th scope='col'>Amount</th><th scope='col'>Status</th><th scope='col'><button type='button' class='btn btn-outline-primary btn-sm' onclick=window.location.replace('upload.html')>Add Invoice</button></th></tr></thead><tbody>";
+    function populateInvoices(all) {
+      for (var index in all) {
+        var invoices = all[index].invoices;
+        if(invoices == undefined) {
+          $("#invoices").html("<h3>Invoices</h3><p><center>Currently No Invoices.</center></p>");
+        }
+        var invoicehtml = "<h3>Invoices</h3><table class='table'><thead><tr><th scope='col'>Date</th><th scope='col'>Description</th><th scope='col'>User</th><th scope='col'>Amount</th><th scope='col'>Status</th><th scope='col'><button type='button' class='btn btn-outline-primary btn-sm' onclick=window.location.replace('upload.html')>Add Invoice</button></th></tr></thead><tbody>";
         for (var i = 0; i < invoices.length; i++) {
-          invoicehtml+="<tr><td>"+(new Date(invoices[i].date)).toLocaleDateString()+"</td><td>"+invoices[i].description+"</td><td>$"+invoices[i].amount+"</td><td>"+invoices[i].status+"</td><th><button type='button' class='btn btn-outline-dark btn-sm' onclick=openInvoiceModal("+i+")>More</button></th></tr>";
+          invoicehtml+="<tr><td>"+(new Date(invoices[i].date)).toLocaleDateString()+"</td><td>"+invoices[i].description+"</td><td>"+all[index].user.name+"</td><td>$"+invoices[i].amount+"</td><td>"+invoices[i].status+"</td><th><button type='button' class='btn btn-outline-dark btn-sm' onclick=openInvoiceModal(\""+index+"-"+i+"\")>More</button></th></tr>";
         }
         invoicehtml+="</tbody></table>";
         $("#invoices").html(invoicehtml);
@@ -199,7 +176,9 @@
     }
 
     function openInvoiceModal (number) {
-      firebase.database().ref(uid+'/invoices/'+number).once('value').then(function(snapshot) {
+      var invoiceUID = number.split("-")[0];
+      var i = number.split("-")[1];
+      firebase.database().ref(invoiceUID+'/invoices/'+i).once('value').then(function(snapshot) {
         var val = snapshot.val();
         $('#date').html(new Date(val.date).toLocaleString());
         $('#amount').html("$"+val.amount);
@@ -207,14 +186,18 @@
         $('#account').html(val.account);
         $('#status').html(val.status);
         $('#receipt').attr('src',val.receipt);
-        $('#modalFooter').html("<button type='button' class='btn btn-danger' data-dismiss='modal' onclick='updateStatus(\""+number+"\",\"delete\")'>Delete</button><button type='button' class='btn btn-secondary' data-dismiss='modal'>Close</button>");
+        $('#modalFooter').html("<button type='button' class='btn btn-success' data-dismiss='modal' onclick='updateStatus(\""+number+"\",\"Completed\")'>Mark Completed</button><button type='button' class='btn btn-warning' data-dismiss='modal' onclick='updateStatus(\""+number+"\",\"Rejected\")'>Reject</button><button type='button' class='btn btn-danger' data-dismiss='modal' onclick='updateStatus(\""+number+"\",\"delete\")'>Delete</button><button type='button' class='btn btn-secondary' data-dismiss='modal'>Close</button>");
       });
       $('#invoiceModal').modal('show');
     }
 
     function updateStatus(number, status) {
+      var invoiceUID = number.split("-")[0];
+      var i = number.split("-")[1];
       if(status == "delete") {
-        firebase.database().ref(uid+'/invoices/'+number).remove();
+        firebase.database().ref(invoiceUID+'/invoices/'+i).remove();
+      } else {
+        firebase.database().ref(invoiceUID+'/invoices/'+i+'/status/').set(status);
       }
     }
   </script>
