@@ -2603,7 +2603,7 @@ AAAAAAAAAEwHAABkcnMvbWVkaWEvaW1hZ2UxLnBuZ1BLBQYAAAAABgAGAIQBAAAAyQAAAAA=
             return true;
           } */
         };
-        var source = window.document;
+        var source = document.getElementsByTagName('html')[0].innerHTML;
         doc.fromHTML(
             source,
             15,
