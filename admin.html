@@ -186,7 +186,7 @@
         $('#account').html(val.account);
         $('#status').html(val.status);
         $('#receipt').attr('src',val.receipt);
-        $('#modalFooter').html("<button type='button' class='btn btn-success' data-dismiss='modal' onclick='updateStatus(\""+number+"\",\"Completed\")'>Mark Completed</button><button type='button' class='btn btn-warning' data-dismiss='modal' onclick='updateStatus(\""+number+"\",\"Rejected\")'>Reject</button><button type='button' class='btn btn-danger' data-dismiss='modal' onclick='updateStatus(\""+number+"\",\"delete\")'>Delete</button><button type='button' class='btn btn-secondary' data-dismiss='modal'>Close</button>");
+        $('#modalFooter').html("<button type='button' class='btn btn-success' data-dismiss='modal' onclick='openReimbursementRequest(\""+number+"\",\"Completed\")'>Open Reimbursement Request</button><button type='button' class='btn btn-success' data-dismiss='modal' onclick='updateStatus(\""+number+"\",\"Completed\")'>Mark Completed</button><button type='button' class='btn btn-warning' data-dismiss='modal' onclick='updateStatus(\""+number+"\",\"Rejected\")'>Reject</button><button type='button' class='btn btn-danger' data-dismiss='modal' onclick='updateStatus(\""+number+"\",\"delete\")'>Delete</button><button type='button' class='btn btn-secondary' data-dismiss='modal'>Close</button>");
       });
       $('#invoiceModal').modal('show');
     }
@@ -199,6 +199,39 @@
       } else {
         firebase.database().ref(invoiceUID+'/invoices/'+i+'/status/').set(status);
       }
+    }
+
+    function openReimbursementRequest (number) {
+      var invoiceUID = number.split("-")[0];
+      var i = number.split("-")[1];
+      var invoiceString = "";
+      var userString = "";
+      firebase.database().ref(invoiceUID+'/invoices/'+i).once('value').then(function(snapshot) {
+        var data = snapshot.val();
+        var elements = [];
+        elements.push("amount=$"+data.amount);
+        elements.push("account="+data.account);
+        elements.push("date="+(new Date()).toDateString());
+        elements.push("description="+data.description);
+        elements.push("uid="+invoiceUID);
+        elements.push("ref="+i);
+        invoiceString = elements.join("&");
+        if(userString != "") { openWindow(invoiceString, userString); }
+      });
+      firebase.database().ref(invoiceUID+'/billing/').once('value').then(function(snapshot) {
+        var data = snapshot.val();
+        var elements = [];
+        elements.push("address1="+data.address1);
+        elements.push("address2="+data.address2);
+        elements.push("citystatezip="+data.city+",%20"+data.state+"%20"+data.zip);
+        elements.push("name="+data.name);
+        userString = elements.join("&");
+        if(invoiceString != "") { openWindow(invoiceString, userString); }
+      });
+    }
+
+    function openWindow(invoiceString, userString, invoiceUID, number) {
+      window.open("request.html?"+invoiceString+"&"+userString,"Reimbursement Request - "+invoiceUID+"-"+number,"menubar=0,toolbar=0");
     }
   </script>
 </body>
