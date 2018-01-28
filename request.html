@@ -2592,11 +2592,9 @@ AAAAAAAAAEwHAABkcnMvbWVkaWEvaW1hZ2UxLnBuZ1BLBQYAAAAABgAGAIQBAAAAyQAAAAA=
     } else if(gup("action") == "download") {
       html2canvas(document.body,{"allowTaint":"false"}).then(function(canvas){
           console.log("yes");
-          var img=canvas.toDataURL("image/png");
-          /* img.setWidth(5100);
-          img.setHeight(6600); */
+          var img=canvas.toDataURL("image/jpeg");
           var doc = new jsPDF();
-          doc.addImage(img,'PNG',0,0);
+          doc.addImage(img,'JPEG',0,0);
           doc.save('Reimbursement Request '+gup("uid")+gup("ref")+'.pdf');
         });
     }
