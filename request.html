@@ -2589,7 +2589,7 @@ AAAAAAAAAEwHAABkcnMvbWVkaWEvaW1hZ2UxLnBuZ1BLBQYAAAAABgAGAIQBAAAAyQAAAAA=
     if(gup("action") == "print") {
       window.print();
     } else if(gup("action") == "download") {
-      html2canvas(document.body,{"allowTaint":"false", "scale":4}).then(function(canvas){
+      html2canvas(document.body,{"allowTaint":"false", "scale":3}).then(function(canvas){
           var img=canvas.toDataURL("image/jpeg");
           var doc = new jsPDF('p','in','letter');
           doc.addImage(img,'JPEG',0,0,3797/(757+8*2)*8.5,11);
