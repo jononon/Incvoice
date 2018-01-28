@@ -2593,7 +2593,7 @@ AAAAAAAAAEwHAABkcnMvbWVkaWEvaW1hZ2UxLnBuZ1BLBQYAAAAABgAGAIQBAAAAyQAAAAA=
           console.log("yes");
           var img=canvas.toDataURL("image/jpeg");
           var doc = new jsPDF('p','in','letter');
-          doc.addImage(img,'JPEG',0,0,3797/757*8.5,11);
+          doc.addImage(img,'JPEG',0,0,(3797+8*2)/757*8.5,11);
           doc.save('Reimbursement Request '+gup("uid")+gup("ref")+'.pdf');
         });
 
