@@ -2569,6 +2569,46 @@ AAAAAAAAAEwHAABkcnMvbWVkaWEvaW1hZ2UxLnBuZ1BLBQYAAAAABgAGAIQBAAAAyQAAAAA=
     return target.replace(new RegExp(search, 'g'), replacement);
   };
 
+  var makeHighResScreenshot = function(srcEl, dpi, docname) {
+    var scaleFactor = Math.floor(dpi / 96);
+    // Save original size of element
+    var originalWidth = srcEl.offsetWidth;
+    var originalHeight = srcEl.offsetHeight;
+    // Save original document size
+    var originalBodyWidth = document.body.offsetWidth;
+    var originalBodyHeight = document.body.offsetHeight;
+
+    // Add style: transform: scale() to srcEl
+    srcEl.style.transform = "scale(" + scaleFactor + ", " + scaleFactor + ")";
+    srcEl.style.transformOrigin = "left top";
+
+    // create wrapper for srcEl to add hardcoded height/width
+    var srcElWrapper = document.createElement('div');
+    srcElWrapper.id = srcEl.id + '-wrapper';
+    srcElWrapper.style.height = originalHeight*scaleFactor + 'px';
+    srcElWrapper.style.width = originalWidth*scaleFactor + 'px';
+    // insert wrapper before srcEl in the DOM tree
+    srcEl.parentNode.insertBefore(srcElWrapper, srcEl);
+    // move srcEl into wrapper
+    srcElWrapper.appendChild(srcEl);
+
+    // Temporarily remove height/width constraints as necessary
+    document.body.style.width = originalBodyWidth*scaleFactor +"px";
+    document.body.style.height = originalBodyHeight*scaleFactor +"px";
+
+    window.scrollTo(0, 0); // html2canvas breaks when we're not at the top of the doc, see html2canvas#820
+    html2canvas(srcElWrapper).then(function(canvas){
+      var destIMG = canvas.toDataURL("image/png");
+      srcElWrapper.style.display = "none";
+      // Reset height/width constraints
+      document.body.style.width = originalBodyWidth + "px";
+      document.body.style.height = originalBodyHeight + "px";
+      var doc = new jsPDF('p','pt','letter');
+      doc.addImage(destIMG,'JPEG',0,0);
+      doc.save(docname);
+    });
+  };
+
   function populateData () {
     document.getElementById("specialInstructions").innerHTML = (gup("specialInstructions") == null ? "" : gup("specialInstructions")).replaceAll("%20"," ");
     document.getElementById("paymentTotal").innerHTML = (gup("amount") == null ? "" : gup("amount")).replaceAll("%20"," ");
@@ -2597,22 +2637,7 @@ AAAAAAAAAEwHAABkcnMvbWVkaWEvaW1hZ2UxLnBuZ1BLBQYAAAAABgAGAIQBAAAAyQAAAAA=
           doc.addImage(img,'JPEG',0,0);
           doc.save('Reimbursement Request '+gup("uid")+gup("ref")+'.pdf');
         }); */
-        var doc = new jsPDF();
-        var elementHandler = {
-          /* '#ignorePDF': function (element, renderer) {
-            return true;
-          } */
-        };
-        var source = document.getElementsByTagName('html')[0].innerHTML;
-        doc.fromHTML(
-            source,
-            15,
-            15,
-            {
-              'width': 180,'elementHandlers': elementHandler
-            });
-
-        doc.save('Reimbursement Request '+gup("uid")+gup("ref")+'.pdf');
+        makeHighResScreenshot(document.body,192,'Reimbursement Request '+gup("uid")+gup("ref")+'.pdf');
     }
   }
 
