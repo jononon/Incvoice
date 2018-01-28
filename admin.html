@@ -186,7 +186,7 @@
         $('#account').html(val.account);
         $('#status').html(val.status);
         $('#receipt').attr('src',val.receipt);
-        $('#modalFooter').html("<button type='button' class='btn btn-success' data-dismiss='modal' onclick='openReimbursementRequest(\""+number+"\",\"Completed\")'>Open Reimbursement Request</button><button type='button' class='btn btn-success' data-dismiss='modal' onclick='updateStatus(\""+number+"\",\"Completed\")'>Mark Completed</button><button type='button' class='btn btn-warning' data-dismiss='modal' onclick='updateStatus(\""+number+"\",\"Rejected\")'>Reject</button><button type='button' class='btn btn-danger' data-dismiss='modal' onclick='updateStatus(\""+number+"\",\"delete\")'>Delete</button><button type='button' class='btn btn-secondary' data-dismiss='modal'>Close</button>");
+        $('#modalFooter').html("<div class=btn-group role=group><button type='button' class='btn btn-light' onclick='openReimbursementRequest(\""+number+"\",\"open\")'>Reimbursement Request</button><button type='button' class='btn btn-light' onclick='openReimbursementRequest(\""+number+"\",\"print\")'>Print</button><button type='button' class='btn btn-light' onclick='openReimbursementRequest(\""+number+"\",\"download\")'>Download</button><button type='button' class='btn btn-success' data-dismiss='modal' onclick='updateStatus(\""+number+"\",\"Completed\")'>Mark Completed</button><button type='button' class='btn btn-warning' data-dismiss='modal' onclick='updateStatus(\""+number+"\",\"Rejected\")'>Reject</button><button type='button' class='btn btn-danger' data-dismiss='modal' onclick='updateStatus(\""+number+"\",\"delete\")'>Delete</button><button type='button' class='btn btn-secondary' data-dismiss='modal'>Close</button>");
       });
       $('#invoiceModal').modal('show');
     }
@@ -201,7 +201,7 @@
       }
     }
 
-    function openReimbursementRequest (number) {
+    function openReimbursementRequest (number,action) {
       var invoiceUID = number.split("-")[0];
       var i = number.split("-")[1];
       var invoiceString = "";
@@ -215,6 +215,7 @@
         elements.push("description="+data.description);
         elements.push("uid="+invoiceUID);
         elements.push("ref="+i);
+        elements.push("action="+action);
         invoiceString = elements.join("&");
         if(userString != "") { openWindow(invoiceString, userString); }
       });
