@@ -54,8 +54,8 @@ function fnUpdateTabs()
 
 <body link=blue vlink=purple id=full>
 
-<table border=0 cellpadding=0 cellspacing=0 style='border-collapse:
- collapse;table-layout:fixed;>
+<table border=0 cellpadding=0 cellspacing=0 width=3812 style='border-collapse:
+ collapse;table-layout:fixed;width:2848pt'>
  <col width=133 style='mso-width-source:userset;mso-width-alt:4266;width:100pt'>
  <col width=68 style='mso-width-source:userset;mso-width-alt:2176;width:51pt'>
  <col width=75 style='mso-width-source:userset;mso-width-alt:2389;width:56pt'>
@@ -2592,7 +2592,7 @@ AAAAAAAAAEwHAABkcnMvbWVkaWEvaW1hZ2UxLnBuZ1BLBQYAAAAABgAGAIQBAAAAyQAAAAA=
       html2canvas(document.body,{"allowTaint":"false", "scale":4}).then(function(canvas){
           var img=canvas.toDataURL("image/jpeg");
           var doc = new jsPDF('p','in','letter');
-          doc.addImage(img,'JPEG',0,0,8.5,11);
+          doc.addImage(img,'JPEG',0,0,3797/(757+8*2)*8.5,11);
           doc.save('Reimbursement Request '+gup("uid")+gup("ref")+'.pdf');
         });
 
