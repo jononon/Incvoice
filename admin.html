@@ -26,6 +26,9 @@
   <div id="invoices" class="container">
     <h3>Invoices</h3>
   </div>
+  <div id="users" class="container">
+    <h3>Users</h3>
+  </div>
   <div id=invoiceModal class="modal" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
@@ -57,6 +60,34 @@
         </div>
         <div class="modal-footer" id=modalFooter>
 
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id=userModal class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Invoice</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <dl class="row">
+            <dt class="col-sm-3">Date</dt>
+            <dd class="col-sm-9" id=name>1/2/2018</dd>
+
+            <dt class="col-sm-3">Amount</dt>
+            <dd class="col-sm-9" id=uid>$22.22</dd>
+
+            <dt class="col-sm-3">Description</dt>
+            <dd class="col-sm-9" id=admin>Test</dd>
+
+            <dt class="col-sm-3 text-truncate">Account</dt>
+            <dd class="col-sm-9" id=billingaddress>99-99999</dd>
+
+          </dl>
         </div>
       </div>
     </div>
@@ -93,22 +124,17 @@
         });
 
         var userRef = firebase.database().ref(uid+'/user');
-        var billingRef = firebase.database().ref(uid+'/billing');
+        var usersRef = firebase.database().ref();
 
         userRef.on('value', function(userSnapshot) {
           $("#welcomename").html("Welcome, "+userSnapshot.val().name+". <button type='button' class='btn btn-secondary btn-sm' onclick=window.location.replace('index.html')>Go to User Console</button>");
           if(!userSnapshot.val().admin) {
             window.location.replace("index.html");
           }
-          billingRef.once('value').then(function(billingSnapshot) {
-            populateInfo(userSnapshot.val(),billingSnapshot.val());
-          });
         });
 
-        billingRef.on('value', function(billingSnapshot) {
-          userRef.once('value').then(function(userSnapshot) {
-            populateInfo(userSnapshot.val(),billingSnapshot.val());
-          });
+        usersRef.on('value', function(usersSnapshot) {
+          populateUsers(usersSnapshot.val());
         });
 
       } else {
@@ -131,53 +157,19 @@
       }
     }
 
-    function populateInfo(user, billing) {
-      var infohtml = "<h3>Info</h3><table class='table'><tbody>";
-      infohtml+="<tr><th scope='row'>Name</th><td>"+user.name+"</td><td><button type='button' class='btn btn-outline-dark btn-sm' onclick=editInfo('userName')>Edit</button></td></tr>";
-      infohtml+="<tr><th scope='row'>Billing Name</th><td>"+billing.name+"</td><td><button type='button' class='btn btn-outline-dark btn-sm' onclick=editInfo('name')>Edit</button></td></tr>";
-      infohtml+="<tr><th scope='row'>Address Line 1</th><td>"+billing.address1+"</td><td><button type='button' class='btn btn-outline-dark btn-sm' onclick=editInfo('address1')>Edit</button></td></tr>";
-      infohtml+="<tr><th scope='row'>Address Line 2</th><td>"+billing.address2+"</td><td><button type='button' class='btn btn-outline-dark btn-sm' onclick=editInfo('address2')>Edit</button></td></tr>";
-      infohtml+="<tr><th scope='row'>City</th><td>"+billing.city+"</td><td><button type='button' class='btn btn-outline-dark btn-sm' onclick=editInfo('city')>Edit</button></td></tr>";
-      infohtml+="<tr><th scope='row'>State</th><td>"+billing.state+"</td><td><button type='button' class='btn btn-outline-dark btn-sm' onclick=editInfo('state')>Edit</button></td></tr>";
-      infohtml+="<tr><th scope='row'>Zip</th><td>"+billing.zip+"</td><td><button type='button' class='btn btn-outline-dark btn-sm' onclick=editInfo('zip')>Edit</button></td></tr>";
-      infohtml+="</tbody></table>";
-      $("#info").html(infohtml);
-    }
-    var currentField = "";
-    function editInfo(section) {
-      currentField = section;
-      switch (currentField) {
-        case "userName":
-          $("#infoTitle").html("Name");
-          firebase.database().ref(uid+'/user/name').once('value').then(function(snapshot) {$("#infoBox").val(snapshot.val())});
-        break;
-        case "name":
-          $("#infoTitle").html("Billing Name");
-          firebase.database().ref(uid+'/billing/name').once('value').then(function(snapshot) {$("#infoBox").val(snapshot.val())});
-        break;
-        case "address1":
-          $("#infoTitle").html("Address Line 1");
-          firebase.database().ref(uid+'/billing/address1').once('value').then(function(snapshot) {$("#infoBox").val(snapshot.val())});
-        break;
-        case "address2":
-          $("#infoTitle").html("Address Line 2");
-          firebase.database().ref(uid+'/billing/address2').once('value').then(function(snapshot) {$("#infoBox").val(snapshot.val())});
-        break;
-        case "city":
-          $("#infoTitle").html("City");
-          firebase.database().ref(uid+'/billing/city').once('value').then(function(snapshot) {$("#infoBox").val(snapshot.val())});
-        break;
-        case "state":
-          $("#infoTitle").html("State");
-          firebase.database().ref(uid+'/billing/state').once('value').then(function(snapshot) {$("#infoBox").val(snapshot.val())});
-        break;
-        case "zip":
-          $("#infoTitle").html("Zip");
-          firebase.database().ref(uid+'/billing/zip').once('value').then(function(snapshot) {$("#infoBox").val(snapshot.val())});
-        break;
+    function populateUsers(all) {
+      if(all == undefined) {
+        $("#users").html("<h3>Invoices</h3><p><center>Currently No Invoices.</center></p>");
+      } else {
+        var usershtml = "<h3>Users</h3><table class='table'><thead><tr><th scope='col'>Name</th><th scope='col'>Admin?</th><th scope='col' class='smallhide'>UID</th><th scope='col'></th></tr></thead><tbody>";
+        for (var index in all) {
+          usershtml+="<tr><td class='smallhide'>"+all[index].user.name+"</td><td>"+((all[index].user.admin)?"Yes":"No")+"</td><td class='smallhide'>"+index+"</td><th><button type='button' class='btn btn-outline-dark btn-sm' onclick=openUserModal(\""+index+"\")>More</button></th></tr>";
+        }
+        usershtml+="</tbody></table>";
+        $("#users").html(usershtml);
       }
-      $('#editInfoModal').modal('show');
     }
+
 
     function finishedEditing() {
       var val = $("#infoBox").val();
@@ -202,6 +194,17 @@
         $('#modalFooter').html("<div class=btn-group role=group><button type='button' class='btn btn-light' onclick='openReimbursementRequest(\""+number+"\",\"open\")'>Reimbursement Request</button><button type='button' class='btn btn-light' onclick='openReimbursementRequest(\""+number+"\",\"print\")'>Print</button><button type='button' class='btn btn-light' onclick='openReimbursementRequest(\""+number+"\",\"download\")'>Download</button></div><button type='button' class='btn btn-success' data-dismiss='modal' onclick='updateStatus(\""+number+"\",\"Completed\")'>Mark Completed</button><button type='button' class='btn btn-warning' data-dismiss='modal' onclick='updateStatus(\""+number+"\",\"Rejected\")'>Reject</button><button type='button' class='btn btn-danger' data-dismiss='modal' onclick='updateStatus(\""+number+"\",\"delete\")'>Delete</button><button type='button' class='btn btn-secondary' data-dismiss='modal'>Close</button>");
       });
       $('#invoiceModal').modal('show');
+    }
+
+    function openUserModal(modalUID) {
+      firebase.database().ref(modalUID).once('value').then(function(snapshot) {
+        var val = snapshot.val();
+        $('#name').html(val.user.name);
+        $('#uid').html(modalUID);
+        $('#admin').html(val.user.admin?"Yes":"No");
+        $('#billingaddress').html("" + val.billing.name + ", " + (val.billing.address1==undefined?" ":(val.billing.address1+", "))+(val.billing.address2==undefined?" ":(val.billing.address2+", "))+val.billing.city + ", " + val.billing.state + " " + val.billing.zip);
+      });
+      $('#userModal').modal('show');
     }
 
     function updateStatus(number, status) {

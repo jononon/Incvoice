@@ -157,13 +157,13 @@
 
     function populateInfo(user, billing) {
       var infohtml = "<h3>Info</h3><table class='table'><tbody>";
-      infohtml+="<tr><th scope='row'>Name</th><td>"+user.name+"</td><td><button type='button' class='btn btn-outline-dark btn-sm' onclick=editInfo('userName')>Edit</button></td></tr>";
-      infohtml+="<tr><th scope='row'>Billing Name</th><td>"+billing.name+"</td><td><button type='button' class='btn btn-outline-dark btn-sm' onclick=editInfo('name')>Edit</button></td></tr>";
-      infohtml+="<tr><th scope='row'>Address Line 1</th><td>"+billing.address1+"</td><td><button type='button' class='btn btn-outline-dark btn-sm' onclick=editInfo('address1')>Edit</button></td></tr>";
-      infohtml+="<tr><th scope='row'>Address Line 2</th><td>"+billing.address2+"</td><td><button type='button' class='btn btn-outline-dark btn-sm' onclick=editInfo('address2')>Edit</button></td></tr>";
-      infohtml+="<tr><th scope='row'>City</th><td>"+billing.city+"</td><td><button type='button' class='btn btn-outline-dark btn-sm' onclick=editInfo('city')>Edit</button></td></tr>";
-      infohtml+="<tr><th scope='row'>State</th><td>"+billing.state+"</td><td><button type='button' class='btn btn-outline-dark btn-sm' onclick=editInfo('state')>Edit</button></td></tr>";
-      infohtml+="<tr><th scope='row'>Zip</th><td>"+billing.zip+"</td><td><button type='button' class='btn btn-outline-dark btn-sm' onclick=editInfo('zip')>Edit</button></td></tr>";
+      infohtml+="<tr><th scope='row'>Name</th><td>"+(user.name==undefined?"":user.name)+"</td><td><button type='button' class='btn btn-outline-dark btn-sm' onclick=editInfo('userName')>Edit</button></td></tr>";
+      infohtml+="<tr><th scope='row'>Billing Name</th><td>"+(billing.name==undefined?"":billing.name)+"</td><td><button type='button' class='btn btn-outline-dark btn-sm' onclick=editInfo('name')>Edit</button></td></tr>";
+      infohtml+="<tr><th scope='row'>Address Line 1</th><td>"+(billing.address1==undefined?"":billing.address1)+"</td><td><button type='button' class='btn btn-outline-dark btn-sm' onclick=editInfo('address1')>Edit</button></td></tr>";
+      infohtml+="<tr><th scope='row'>Address Line 2</th><td>"+(billing.address2==undefined?"":billing.address2)+"</td><td><button type='button' class='btn btn-outline-dark btn-sm' onclick=editInfo('address2')>Edit</button></td></tr>";
+      infohtml+="<tr><th scope='row'>City</th><td>"+(billing.city==undefined?"":billing.city)+"</td><td><button type='button' class='btn btn-outline-dark btn-sm' onclick=editInfo('city')>Edit</button></td></tr>";
+      infohtml+="<tr><th scope='row'>State</th><td>"+(billing.state==undefined?"":billing.state)+"</td><td><button type='button' class='btn btn-outline-dark btn-sm' onclick=editInfo('state')>Edit</button></td></tr>";
+      infohtml+="<tr><th scope='row'>Zip</th><td>"+(billing.zip==undefined?"":billing.zip)+"</td><td><button type='button' class='btn btn-outline-dark btn-sm' onclick=editInfo('zip')>Edit</button></td></tr>";
       infohtml+="</tbody></table>";
       $("#info").html(infohtml);
     }
@@ -205,10 +205,17 @@
 
     function finishedEditing() {
       var val = $("#infoBox").val();
+      var ref;
       if(currentField=="userName")
-        firebase.database().ref(uid+'/user/name').set(val);
+        ref = firebase.database().ref(uid+'/user/name');
       else
-        firebase.database().ref(uid+'/billing/'+currentField).set(val);
+        ref = firebase.database().ref(uid+'/billing/'+currentField);
+
+      if(val == "")
+        ref.remove();
+      else {
+        ref.set(val);
+      }
       $('#editInfoModal').modal('hide');
     }
 
