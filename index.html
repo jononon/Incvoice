@@ -1,11 +1,23 @@
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <script src="static/js/jquery-3.1.0.min.js"></script>
   <script src="static/js/bootstrap.bundle.min.js"></script>
   <script src="static/js/jspdf.js"></script>
   <link rel="stylesheet" type="text/css" href="static/css/bootstrap.min.css">
 </head>
 <body>
+  <style>
+
+    .smallhide {
+      display: none;
+    }
+    @media (min-width: 576px) {
+        .smallhide {
+            display: table-cell;
+        }
+    }
+
+  </style>
   <nav class="navbar navbar-expand-lg navbar-light bg-light" style="margin-bottom:20px">
     <a class="navbar-brand" href="#"><strong>Incvoice</strong></a>
       <span class="navbar-text" id=welcomename>
@@ -134,9 +146,9 @@
       if(invoices == undefined) {
         $("#invoices").html("<h3>Invoices</h3><p><center>Currently No Invoices. <button type='button' class='btn btn-outline-primary btn-sm' onclick=window.location.replace('upload.html')>Add one.</button></center></p>");
       } else if(invoices.length > 0) {
-        var invoicehtml = "<h3>Invoices</h3><table class='table'><thead><tr><th scope='col'>Date</th><th scope='col'>Description</th><th scope='col'>Amount</th><th scope='col'>Status</th><th scope='col'><button type='button' class='btn btn-outline-primary btn-sm' onclick=window.location.replace('upload.html')>Add Invoice</button></th></tr></thead><tbody>";
+        var invoicehtml = "<h3>Invoices</h3><table class='table'><thead><tr><th scope='col' class='smallhide'>Date</th><th scope='col'>Description</th><th scope='col' class='smallhide'>Amount</th><th scope='col'>Status</th><th scope='col'><button type='button' class='btn btn-outline-primary btn-sm' onclick=window.location.replace('upload.html')>Add Invoice</button></th></tr></thead><tbody>";
         for (var i = 0; i < invoices.length; i++) {
-          invoicehtml+="<tr><td>"+(new Date(invoices[i].date)).toLocaleDateString()+"</td><td>"+invoices[i].description+"</td><td>$"+invoices[i].amount+"</td><td>"+invoices[i].status+"</td><th><button type='button' class='btn btn-outline-dark btn-sm' onclick=openInvoiceModal("+i+")>More</button></th></tr>";
+          invoicehtml+="<tr><td class='smallhide'>"+(new Date(invoices[i].date)).toLocaleDateString()+"</td><td>"+invoices[i].description+"</td><td class='smallhide'>$"+invoices[i].amount+"</td><td>"+invoices[i].status+"</td><th><button type='button' class='btn btn-outline-dark btn-sm' onclick=openInvoiceModal("+i+")>More</button></th></tr>";
         }
         invoicehtml+="</tbody></table>";
         $("#invoices").html(invoicehtml);
