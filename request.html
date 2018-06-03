@@ -2558,7 +2558,7 @@ AAAAAAAAAEwHAABkcnMvbWVkaWEvaW1hZ2UxLnBuZ1BLBQYAAAAABgAGAIQBAAAAyQAAAAA=
     var regexS = "[\\?&]"+name+"=([^&#]*)";
     var regex = new RegExp( regexS );
     var results = regex.exec( window.location.href );
-    if( results == undefined )
+    if( results == null)
       return "";
     else
       return results[1];
@@ -2569,23 +2569,23 @@ AAAAAAAAAEwHAABkcnMvbWVkaWEvaW1hZ2UxLnBuZ1BLBQYAAAAABgAGAIQBAAAAyQAAAAA=
   };
 
   function populateData () {
-    document.getElementById("specialInstructions").innerHTML = (gup("specialInstructions") == undefined ? "" : gup("specialInstructions")).replaceAll("%20"," ");
-    document.getElementById("paymentTotal").innerHTML = (gup("amount") == undefined ? "" : gup("amount")).replaceAll("%20"," ");
-    document.getElementById("address1").innerHTML = (gup("address1") == undefined ? "" : gup("address1")).replaceAll("%20"," ");
-    document.getElementById("address2").innerHTML = (gup("address2") == undefined ? "" : gup("address2")).replaceAll("%20"," ");
-    document.getElementById("citystatezip").innerHTML = (gup("citystatezip") == undefined ? "" : gup("citystatezip")).replaceAll("%20"," ");
-    document.getElementById("name").innerHTML = (gup("name") == undefined ? "" : gup("name")).replaceAll("%20"," ");
-    document.getElementById("account").innerHTML = (gup("account") == undefined ? "" : gup("account")).replaceAll("%20"," ");
-    document.getElementById("amount").innerHTML = (gup("amount") == undefined ? "" : gup("amount")).replaceAll("%20"," ");
-    document.getElementById("invoice").innerHTML = (gup("invoice") == undefined ? "" : gup("invoice")).replaceAll("%20"," ");
-    document.getElementById("projectCode").innerHTML = (gup("projectCode") == undefined ? "" : gup("projectCode")).replaceAll("%20"," ");
-    document.getElementById("memo").innerHTML = (gup("memo") == undefined ? "" : gup("memo")).replaceAll("%20"," ");
-    document.getElementById("description").innerHTML = (gup("description") == undefined ? "" : gup("description")).replaceAll("%20"," ");
-    document.getElementById("date1").innerHTML = (gup("date1") == undefined ? "" : gup("date")).replaceAll("%20"," ");
-    document.getElementById("date2").innerHTML = (gup("date2") == undefined ? "" : gup("date")).replaceAll("%20"," ");
-    document.getElementById("remarks").innerHTML = (gup("remarks") == undefined ? "" : gup("remarks")).replaceAll("%20"," ");
-    document.getElementById("uid").innerHTML = "UID "+(gup("uid") == undefined ? "" : gup("uid")).replaceAll("%20"," ");
-    document.getElementById("ref").innerHTML = (gup("ref") == undefined ? "" : gup("ref")).replaceAll("%20"," ");
+    document.getElementById("specialInstructions").innerHTML = (gup("specialInstructions") == "undefined" ? "" : gup("specialInstructions")).replaceAll("%20"," ");
+    document.getElementById("paymentTotal").innerHTML = (gup("amount") == "undefined" ? "" : gup("amount")).replaceAll("%20"," ");
+    document.getElementById("address1").innerHTML = (gup("address1") == "undefined" ? "" : gup("address1")).replaceAll("%20"," ");
+    document.getElementById("address2").innerHTML = (gup("address2") == "undefined" ? "" : gup("address2")).replaceAll("%20"," ");
+    document.getElementById("citystatezip").innerHTML = (gup("citystatezip") == "undefined" ? "" : gup("citystatezip")).replaceAll("%20"," ");
+    document.getElementById("name").innerHTML = (gup("name") == "undefined" ? "" : gup("name")).replaceAll("%20"," ");
+    document.getElementById("account").innerHTML = (gup("account") == "undefined" ? "" : gup("account")).replaceAll("%20"," ");
+    document.getElementById("amount").innerHTML = (gup("amount") == "undefined" ? "" : gup("amount")).replaceAll("%20"," ");
+    document.getElementById("invoice").innerHTML = (gup("invoice") == "undefined" ? "" : gup("invoice")).replaceAll("%20"," ");
+    document.getElementById("projectCode").innerHTML = (gup("projectCode") == "undefined" ? "" : gup("projectCode")).replaceAll("%20"," ");
+    document.getElementById("memo").innerHTML = (gup("memo") == "undefined" ? "" : gup("memo")).replaceAll("%20"," ");
+    document.getElementById("description").innerHTML = (gup("description") == "undefined" ? "" : gup("description")).replaceAll("%20"," ");
+    document.getElementById("date1").innerHTML = (gup("date1") == "undefined" ? "" : gup("date")).replaceAll("%20"," ");
+    document.getElementById("date2").innerHTML = (gup("date2") == "undefined" ? "" : gup("date")).replaceAll("%20"," ");
+    document.getElementById("remarks").innerHTML = (gup("remarks") == "undefined" ? "" : gup("remarks")).replaceAll("%20"," ");
+    document.getElementById("uid").innerHTML = "UID "+(gup("uid") == "undefined" ? "" : gup("uid")).replaceAll("%20"," ");
+    document.getElementById("ref").innerHTML = (gup("ref") == "undefined" ? "" : gup("ref")).replaceAll("%20"," ");
     if(gup("action") == "print") {
       window.print();
     } else if(gup("action") == "download") {
