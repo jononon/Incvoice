@@ -149,12 +149,14 @@
           $("#invoices").html("<h3>Invoices</h3><p><center>Currently No Invoices.</center></p>");
         }
         var invoicehtml = "<h3>Invoices</h3><table class='table'><thead><tr><th scope='col' class='smallhide'>Date</th><th scope='col'>Description</th><th scope='col' class='smallhide'>User</th><th scope='col' class='smallhide'>Amount</th><th scope='col'>Status</th><th scope='col'></th></tr></thead><tbody>";
-        for (var i = 0; i < invoices.length; i++) {
-          invoicehtml+="<tr><td class='smallhide'>"+(new Date(invoices[i].date)).toLocaleDateString()+"</td><td>"+invoices[i].description+"</td><td class='smallhide'>"+all[index].user.name+"</td><td class='smallhide'>$"+invoices[i].amount+"</td><td>"+invoices[i].status+"</td><th><button type='button' class='btn btn-outline-dark btn-sm' onclick=openInvoiceModal(\""+index+"-"+i+"\")>More</button></th></tr>";
+        if (invoices != undefined) {
+          for (var i = 0; i < invoices.length; i++) {
+            invoicehtml+="<tr><td class='smallhide'>"+(new Date(invoices[i].date)).toLocaleDateString()+"</td><td>"+invoices[i].description+"</td><td class='smallhide'>"+all[index].user.name+"</td><td class='smallhide'>$"+invoices[i].amount+"</td><td>"+invoices[i].status+"</td><th><button type='button' class='btn btn-outline-dark btn-sm' onclick=openInvoiceModal(\""+index+"-"+i+"\")>More</button></th></tr>";
+          }
         }
-        invoicehtml+="</tbody></table>";
-        $("#invoices").html(invoicehtml);
       }
+      invoicehtml+="</tbody></table>";
+      $("#invoices").html(invoicehtml);
     }
 
     function populateUsers(all) {
