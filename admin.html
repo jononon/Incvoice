@@ -143,11 +143,9 @@
     });
 
     function populateInvoices(all) {
+      $("#invoices").html("<h3>Invoices</h3><p><center>Currently No Invoices.</center></p>");
       for (var index in all) {
         var invoices = all[index].invoices;
-        if(invoices == undefined) {
-          $("#invoices").html("<h3>Invoices</h3><p><center>Currently No Invoices.</center></p>");
-        }
         var invoicehtml = "<h3>Invoices</h3><table class='table'><thead><tr><th scope='col' class='smallhide'>Date</th><th scope='col'>Description</th><th scope='col' class='smallhide'>User</th><th scope='col' class='smallhide'>Amount</th><th scope='col'>Status</th><th scope='col'></th></tr></thead><tbody>";
         if (invoices != undefined) {
           for (var i = 0; i < invoices.length; i++) {
