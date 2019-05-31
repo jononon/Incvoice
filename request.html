@@ -540,7 +540,7 @@ AAAGAAYAhAEAAM8+AAAAAA==
    </tr>
    <tr>
     <td height=1></td>
-    <td rowspan=4 align=left valign=top>⬤</td>
+    <td id=mailDot rowspan=4 align=left valign=top>◯</td>
    </tr>
    <tr>
     <td height=2></td>
@@ -549,8 +549,8 @@ AAAGAAYAhAEAAM8+AAAAAA==
    </tr>
    <tr>
     <td height=1></td>
-    <td></td>
-    <td rowspan=4 align=left valign=top>◯</td>
+    <td></td> <!-- DD -->
+    <td id=directDepositDot rowspan=4 align=left valign=top>◯</td>
    </tr>
    <tr>
     <td height=17></td>
@@ -2586,6 +2586,12 @@ AAAAAAAAAEwHAABkcnMvbWVkaWEvaW1hZ2UxLnBuZ1BLBQYAAAAABgAGAIQBAAAAyQAAAAA=
     document.getElementById("remarks").innerHTML = (gup("remarks") == "undefined" ? "" : gup("remarks")).replaceAll("%20"," ");
     document.getElementById("uid").innerHTML = "UID "+(gup("uid") == "undefined" ? "" : gup("uid")).replaceAll("%20"," ");
     document.getElementById("ref").innerHTML = (gup("ref") == "undefined" ? "" : gup("ref")).replaceAll("%20"," ");
+    if(gup("dd") == "true") {
+      document.getElementById("directDepositDot").innerHTML="⬤";
+    } else {
+      document.getElementById("mailDot").innerHTML= "⬤";
+    }
+    
     if(gup("action") == "print") {
       window.print();
     } else if(gup("action") == "download") {

@@ -146,11 +146,18 @@
       if(invoices == undefined) {
         $("#invoices").html("<h3>Invoices</h3><p><center>Currently No Invoices. <button type='button' class='btn btn-outline-primary btn-sm' onclick=window.location.replace('upload.html')>Add one.</button></center></p>");
       } else if(invoices.length > 0) {
-        var invoicehtml = "<h3>Invoices</h3><table class='table'><thead><tr><th scope='col' class='smallhide'>Date</th><th scope='col'>Description</th><th scope='col' class='smallhide'>Amount</th><th scope='col'>Status</th><th scope='col'><button type='button' class='btn btn-outline-primary btn-sm' onclick=window.location.replace('upload.html')>Add Invoice</button></th></tr></thead><tbody>";
+        var currentYear = (new Date(invoices[1].date)).getYear();
+        var invoicehtml = "<h3>Invoices</h3><small><button type='button' class='btn btn-outline-primary btn-sm' onclick=window.location.replace('upload.html')>Add Invoice</button></small><br><br><div id=accordion><div class=card><div class='card-header' id='heading"+currentYear+"'><h5 class='mb-0'><button class='btn btn-link' data-toggle='collapse' data-target='#collapse"+currentYear+"' aria-expanded='true' aria-controls='collapse"+currentYear+"'>"+(1900+currentYear)+"</button></h5></div><div id='collapse"+currentYear+"' class='collapse show' aria-labelledby='heading"+currentYear+"' data-parent='#accordion'><div class='card-body'><table class='table'><thead><tr><th scope='col' class='smallhide'>Date</th><th scope='col'>Description</th><th scope='col' class='smallhide'>Amount</th><th scope='col'>Status</th><th scope='col'></th></tr></thead><tbody>";
         for (var i = 0; i < invoices.length; i++) {
+          console.log((new Date(invoices[i].date)).getYear());
+          if((new Date(invoices[i].date)).getYear() > currentYear) {
+            currentYear = (new Date(invoices[i].date)).getYear();
+            invoicehtml += "</tbody></table></div></div></div><div class=card><div class='card-header' id='heading"+currentYear+"'><h5 class='mb-0'><button class='btn btn-link' data-toggle='collapse' data-target='#collapse"+currentYear+"' aria-expanded='true' aria-controls='collapse"+currentYear+"'>"+(1900+currentYear)+"</button></h5></div><div id='collapse"+currentYear+"' class='collapse show' aria-labelledby='heading"+currentYear+"' data-parent='#accordion'><div class='card-body'><table class='table'><thead><tr><th scope='col' class='smallhide'>Date</th><th scope='col'>Description</th><th scope='col' class='smallhide'>Amount</th><th scope='col'>Status</th><th scope='col'></th></tr></thead><tbody>";
+
+          }
           invoicehtml+="<tr><td class='smallhide'>"+(new Date(invoices[i].date)).toLocaleDateString()+"</td><td>"+invoices[i].description+"</td><td class='smallhide'>$"+invoices[i].amount+"</td><td>"+invoices[i].status+"</td><th><button type='button' class='btn btn-outline-dark btn-sm' onclick=openInvoiceModal("+i+")>More</button></th></tr>";
         }
-        invoicehtml+="</tbody></table>";
+        invoicehtml+="</tbody></table></div></div></div></div>";
         $("#invoices").html(invoicehtml);
       }
     }
@@ -164,6 +171,7 @@
       infohtml+="<tr><th scope='row'>City</th><td>"+(billing.city==undefined?"":billing.city)+"</td><td><button type='button' class='btn btn-outline-dark btn-sm' onclick=editInfo('city')>Edit</button></td></tr>";
       infohtml+="<tr><th scope='row'>State</th><td>"+(billing.state==undefined?"":billing.state)+"</td><td><button type='button' class='btn btn-outline-dark btn-sm' onclick=editInfo('state')>Edit</button></td></tr>";
       infohtml+="<tr><th scope='row'>Zip</th><td>"+(billing.zip==undefined?"":billing.zip)+"</td><td><button type='button' class='btn btn-outline-dark btn-sm' onclick=editInfo('zip')>Edit</button></td></tr>";
+      infohtml+="<tr><th scope='row'>Direct Deposit?</th><td></td><td><input type='checkbox' id='directDeposit'  onclick=\"buttonChecked()\" "+(billing.directDeposit==undefined?"":billing.directDeposit == true?"checked":"")+"></td></tr>";
       infohtml+="</tbody></table>";
       $("#info").html(infohtml);
     }
@@ -237,6 +245,11 @@
       if(status == "delete") {
         firebase.database().ref(uid+'/invoices/'+number).remove();
       }
+    }
+
+    function buttonChecked () {
+      console.log(document.getElementById("directDeposit").checked);
+      firebase.database().ref(uid+"/billing/directDeposit").set(document.getElementById("directDeposit").checked);
     }
   </script>
 </body>

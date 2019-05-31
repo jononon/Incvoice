@@ -242,6 +242,9 @@
         elements.push("address2="+data.address2);
         elements.push("citystatezip="+data.city+",%20"+data.state+"%20"+data.zip);
         elements.push("name="+data.name);
+        if(data.directDeposit) {
+          elements.push("dd=true");
+        }
         userString = elements.join("&");
         if(invoiceString != "") { openWindow(invoiceString, userString); }
       });
