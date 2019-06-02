@@ -144,7 +144,7 @@
 
     function populateInvoices(all) {
       $("#invoices").html("<h3>Invoices</h3><p><center>Currently No Invoices.</center></p>");
-      var invoicehtml = "<h3>Invoices</h3><table class='table'><thead><tr><th scope='col' class='smallhide'>Date</th><th scope='col'>Description</th><th scope='col' class='smallhide'>User</th><th scope='col' class='smallhide'>Amount</th><th scope='col'>Status</th><th scope='col'></th></tr></thead><tbody>";
+      var invoicehtml = "<h3>Invoices</h3><table class='table'><thead><tr><th scope='col' class='smallhide'>Date</th><th scope='col'>Description</th><th scope='col' class='smallhide'>User</th><th scope='col' class='smallhide'>Amount</th><th scope='col'>Status</th><th scope='col'><button type='button' class='btn btn-outline-primary btn-sm' onclick=window.location.replace('upload.html?admin=true')>Add Invoice</button></th></tr></thead><tbody>";
       for (var index in all) {
         var invoices = all[index].invoices;
         if (invoices != undefined) {

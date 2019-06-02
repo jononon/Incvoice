@@ -18,6 +18,10 @@
     </div></div>
     <div class="row"><div class="col-1"></div><div class="col-10">
       <form id=invoiceForm>
+        <div class="form-group row" id=dropdownGroup>
+          <label for="dropdownSelect" class="col-sm-2 col-form-label">Create for</label>
+          <div class="col-sm-10" id=dropdown></div>
+        </div>
         <div class="form-group row">
           <label for="amount" class="col-sm-2 col-form-label">Amount</label>
           <div class="col-sm-10">
@@ -159,6 +163,39 @@
         submitForm();
     });
 
+    function gup( name )
+    {
+      name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+      var regexS = "[\\?&]"+name+"=([^&#]*)";
+      var regex = new RegExp( regexS );
+      var results = regex.exec( window.location.href );
+      if( results == null)
+        return "";
+      else
+        return results[1];
+    }
+
+    if(gup("admin") == "true") {
+      firebase.database().ref().once("value").then(function(snapshot) {
+        var database = snapshot.val();
+        var html  = "<select class=\"form-control\" id=dropdownSelect><option value=\"\">Select Person</option>";
+        for(uid in database) {
+          html+= "<option value=\""+uid+"\">"+database[uid].user.name+"</option>";
+        }
+        html+="</select>";
+        $("#dropdown").html(html);
+      });
+    } else {
+      $("#dropdownGroup").hide();
+    }
+    // <select class="form-control" id="exampleFormControlSelect1">
+    //                 <option>Jonathan Damico</option>
+    //                 <option>2</option>
+    //                 <option>3</option>
+    //                 <option>4</option>
+    //                 <option>5</option>
+    //               </select>
+
     function submitForm () {
 
       var element = document.getElementById('receipt');
@@ -185,7 +222,13 @@
             status: "Submitted",
             account: $("input[name=gridRadios]:checked").val()
           };
-          var ref = firebase.database().ref(uid+'/invoices/');
+          var uploadUID;
+          if($("#dropdownSelect").val() == "" || $("#dropdownSelect").val() == undefined) {
+            uploadUID = uid;
+          } else {
+            uploadUID = $("#dropdownSelect").val();
+          }
+          var ref = firebase.database().ref(uploadUID+'/invoices/');
           ref.once('value').then(function(snapshot) {
             var arr = snapshot.val();
             if(arr == undefined)
