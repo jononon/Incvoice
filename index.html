@@ -3,6 +3,7 @@
   <script src="static/js/jquery-3.1.0.min.js"></script>
   <script src="static/js/bootstrap.bundle.min.js"></script>
   <script src="static/js/jspdf.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.0.943/build/pdf.min.js"></script>
   <link rel="stylesheet" type="text/css" href="static/css/bootstrap.min.css">
 </head>
 <body>
@@ -81,7 +82,8 @@
             <dt class="col-sm-3 text-truncate">Status</dt>
             <dd class="col-sm-9" id=status>Submitted</dd>
           </dl>
-          <img id=receipt src="http://www.rmweb.co.uk/community/uploads/monthly_03_2015/post-7247-0-41783300-1427404038.jpg" class="img-fluid" alt="Responsive image">
+          <embed id=receiptpdf src="https://firebasestorage.googleapis.com/v0/b/incvoice-da4b0.appspot.com/o/receipts%2F5dcf0d52-d8c1-1160-4453-861cee04c214-1559599996654.jpg?alt=media&token=0ba18ff9-3757-49de-a93d-957afa25d8bc" width="100%" height="375" type="application/pdf">
+          <img id=receipt onerror="imageLoaded();" src="http://www.rmweb.co.uk/community/uploads/monthly_03_2015/post-7247-0-41783300-1427404038.jpg" class="img-fluid" alt="Responsive image">
         </div>
         <div class="modal-footer" id=modalFooter></div>
       </div>
@@ -228,6 +230,8 @@
     }
 
     function openInvoiceModal (number) {
+      $("#receiptpdf").hide();
+      $("#receipt").show();
       firebase.database().ref(uid+'/invoices/'+number).once('value').then(function(snapshot) {
         var val = snapshot.val();
         $('#date').html(new Date(val.date).toLocaleString());
@@ -235,10 +239,17 @@
         $('#description').html(val.description);
         $('#account').html(val.account);
         $('#status').html(val.status);
+        $('#receiptpdf').attr('src',val.receipt);
         $('#receipt').attr('src',val.receipt);
         $('#modalFooter').html("<button type='button' class='btn btn-danger' data-dismiss='modal' onclick='updateStatus(\""+number+"\",\"delete\")'>Delete</button><button type='button' class='btn btn-secondary' data-dismiss='modal'>Close</button>");
       });
       $('#invoiceModal').modal('show');
+    }
+
+    function imageLoaded () {
+      console.log("test");
+      $("#receipt").hide();
+      $("#receiptpdf").show();
     }
 
     function updateStatus(number, status) {

@@ -25,6 +25,8 @@
   </nav>
   <div id="invoices" class="container">
     <h3>Invoices</h3>
+    <p><input type=checkbox id=submittedFilter onclick="filterSubmitted();">Show only "Submitted"<br></p>
+    <div id=table></div>
   </div>
   <div id="users" class="container">
     <h3>Users</h3>
@@ -56,10 +58,13 @@
             <dd class="col-sm-9" id=status>Submitted</dd>
           </dl>
           <div id="buttons"></div>
-          <img id=receipt src="http://www.rmweb.co.uk/community/uploads/monthly_03_2015/post-7247-0-41783300-1427404038.jpg" class="img-fluid" alt="Responsive image">
+          <embed id=receiptpdf src="https://firebasestorage.googleapis.com/v0/b/incvoice-da4b0.appspot.com/o/receipts%2F5dcf0d52-d8c1-1160-4453-861cee04c214-1559599996654.jpg?alt=media&token=0ba18ff9-3757-49de-a93d-957afa25d8bc" width="100%" height="375" type="application/pdf">
+          <img id=receipt onerror="imageLoaded();" src="http://www.rmweb.co.uk/community/uploads/monthly_03_2015/post-7247-0-41783300-1427404038.jpg" class="img-fluid" alt="Responsive image">
+          <div id=upperButtons class=text-right></div>
+          <div id=middleButtons class=text-right></div>
         </div>
         <div class="modal-footer" id=modalFooter>
-
+          
         </div>
       </div>
     </div>
@@ -95,6 +100,8 @@
 
   <script src="https://www.gstatic.com/firebasejs/4.8.1/firebase.js"></script>
   <script>
+    var filterSubmitted;
+
     // Initialize Firebase
     var config = {
       apiKey: "AIzaSyBpc8vBRJ0TzfQFXXTu749BXsqAT4RWwrI",
@@ -120,8 +127,22 @@
 
         var invoiceRef = firebase.database().ref();
         invoiceRef.on('value', function(snapshot) {
-          populateInvoices(snapshot.val());
+          if (document.getElementById("submittedFilter") == null) {
+            populateInvoices(snapshot.val());
+          } else {
+            populateInvoices(snapshot.val(), document.getElementById("submittedFilter").checked);
+          }
         });
+
+        filterSubmitted = function() {
+          invoiceRef.once('value').then(function(snapshot) {
+            if (document.getElementById("submittedFilter") == null) {
+              populateInvoices(snapshot.val());
+            } else {
+              populateInvoices(snapshot.val(), document.getElementById("submittedFilter").checked);
+            }
+          });
+        }
 
         var userRef = firebase.database().ref(uid+'/user');
         var usersRef = firebase.database().ref();
@@ -142,19 +163,20 @@
       }
     });
 
-    function populateInvoices(all) {
-      $("#invoices").html("<h3>Invoices</h3><p><center>Currently No Invoices.</center></p>");
-      var invoicehtml = "<h3>Invoices</h3><table class='table'><thead><tr><th scope='col' class='smallhide'>Date</th><th scope='col'>Description</th><th scope='col' class='smallhide'>User</th><th scope='col' class='smallhide'>Amount</th><th scope='col'>Status</th><th scope='col'><button type='button' class='btn btn-outline-primary btn-sm' onclick=window.location.replace('upload.html?admin=true')>Add Invoice</button></th></tr></thead><tbody>";
+    function populateInvoices(all, submittedFilter) {
+      $("#table").html("<p><center>Currently No Invoices.</center></p>");
+      var invoicehtml = "<table class='table'><thead><tr><th scope='col' class='smallhide'>Date</th><th scope='col'>Description</th><th scope='col' class='smallhide'>User</th><th scope='col' class='smallhide'>Amount</th><th scope='col'>Status</th><th scope='col'><button type='button' class='btn btn-outline-primary btn-sm' onclick=window.location.replace('upload.html?admin=true')>Add Invoice</button></th></tr></thead><tbody>";
       for (var index in all) {
         var invoices = all[index].invoices;
         if (invoices != undefined) {
           for (var i = 0; i < invoices.length; i++) {
+            if(!submittedFilter || invoices[i].status == "Submitted")
             invoicehtml+="<tr><td class='smallhide'>"+(new Date(invoices[i].date)).toLocaleDateString()+"</td><td>"+invoices[i].description+"</td><td class='smallhide'>"+all[index].user.name+"</td><td class='smallhide'>$"+invoices[i].amount+"</td><td>"+invoices[i].status+"</td><th><button type='button' class='btn btn-outline-dark btn-sm' onclick=openInvoiceModal(\""+index+"-"+i+"\")>More</button></th></tr>";
           }
         }
       }
       invoicehtml+="</tbody></table>";
-      $("#invoices").html(invoicehtml);
+      $("#table").html(invoicehtml);
     }
 
     function populateUsers(all) {
@@ -181,6 +203,8 @@
     }
 
     function openInvoiceModal (number) {
+      $("#receiptpdf").hide();
+      $("#receipt").show();
       var invoiceUID = number.split("-")[0];
       var i = number.split("-")[1];
       firebase.database().ref(invoiceUID+'/invoices/'+i).once('value').then(function(snapshot) {
@@ -191,9 +215,18 @@
         $('#account').html(val.account);
         $('#status').html(val.status);
         $('#receipt').attr('src',val.receipt);
-        $('#modalFooter').html("<div class=btn-group role=group><button type='button' class='btn btn-light' onclick='openReimbursementRequest(\""+number+"\",\"open\")'>Reimbursement Request</button><button type='button' class='btn btn-light' onclick='openReimbursementRequest(\""+number+"\",\"print\")'>Print</button><button type='button' class='btn btn-light' onclick='openReimbursementRequest(\""+number+"\",\"download\")'>Download</button></div><button type='button' class='btn btn-success' data-dismiss='modal' onclick='updateStatus(\""+number+"\",\"Completed\")'>Mark Completed</button><button type='button' class='btn btn-warning' data-dismiss='modal' onclick='updateStatus(\""+number+"\",\"Rejected\")'>Reject</button><button type='button' class='btn btn-danger' data-dismiss='modal' onclick='updateStatus(\""+number+"\",\"delete\")'>Delete</button><button type='button' class='btn btn-secondary' data-dismiss='modal'>Close</button>");
+        $('#receiptpdf').attr('src',val.receipt);
+        $("#middleButtons").html("<div class=btn-group role=group><button type='button' class='btn btn-light' onclick='openReimbursementRequest(\""+number+"\",\"open\")'>Reimbursement Request</button><button type='button' class='btn btn-light' onclick='openReimbursementRequest(\""+number+"\",\"print\")'>Print</button><button type='button' class='btn btn-light' onclick='openReimbursementRequest(\""+number+"\",\"download\")'>Download</button></div>");
+        $("#upperButtons").html("<div class=btn-group role=group><button type='button' class='btn btn-light' onclick='window.open(\""+val.receipt+"\");'>Open Receipt</button></div>")
+        $('#modalFooter').html("<button type='button' class='btn btn-success' data-dismiss='modal' onclick='updateStatus(\""+number+"\",\"Completed\")'>Mark Completed</button><button type='button' class='btn btn-warning' data-dismiss='modal' onclick='updateStatus(\""+number+"\",\"Rejected\")'>Reject</button><button type='button' class='btn btn-danger' data-dismiss='modal' onclick='updateStatus(\""+number+"\",\"delete\")'>Delete</button><button type='button' class='btn btn-secondary' data-dismiss='modal'>Close</button>");
       });
       $('#invoiceModal').modal('show');
+    }
+
+    function imageLoaded () {
+      console.log("test");
+      $("#receipt").hide();
+      $("#receiptpdf").show();
     }
 
     function openUserModal(modalUID) {
