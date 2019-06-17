@@ -170,6 +170,9 @@
         var invoices = all[index].invoices;
         if (invoices != undefined) {
           for (var i = 0; i < invoices.length; i++) {
+            if(invoices[i] == undefined) {
+              continue;
+            }
             if(!submittedFilter || invoices[i].status == "Submitted")
             invoicehtml+="<tr><td class='smallhide'>"+(new Date(invoices[i].date)).toLocaleDateString()+"</td><td>"+invoices[i].description+"</td><td class='smallhide'>"+all[index].user.name+"</td><td class='smallhide'>$"+invoices[i].amount+"</td><td>"+invoices[i].status+"</td><th><button type='button' class='btn btn-outline-dark btn-sm' onclick=openInvoiceModal(\""+index+"-"+i+"\")>More</button></th></tr>";
           }
