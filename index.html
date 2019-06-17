@@ -151,6 +151,9 @@
         var currentYear = (new Date(invoices[1].date)).getYear();
         var invoicehtml = "<h3>Invoices</h3><small><button type='button' class='btn btn-outline-primary btn-sm' onclick=window.location.replace('upload.html')>Add Invoice</button></small><br><br><div id=accordion><div class=card><div class='card-header' id='heading"+currentYear+"'><h5 class='mb-0'><button class='btn btn-link' data-toggle='collapse' data-target='#collapse"+currentYear+"' aria-expanded='true' aria-controls='collapse"+currentYear+"'>"+(1900+currentYear)+"</button></h5></div><div id='collapse"+currentYear+"' class='collapse show' aria-labelledby='heading"+currentYear+"' data-parent='#accordion'><div class='card-body'><table class='table'><thead><tr><th scope='col' class='smallhide'>Date</th><th scope='col'>Description</th><th scope='col' class='smallhide'>Amount</th><th scope='col'>Status</th><th scope='col'></th></tr></thead><tbody>";
         for (var i = 0; i < invoices.length; i++) {
+          if(invoices[i] == undefined) {
+              continue;
+          }
           console.log((new Date(invoices[i].date)).getYear());
           if((new Date(invoices[i].date)).getYear() > currentYear) {
             currentYear = (new Date(invoices[i].date)).getYear();
